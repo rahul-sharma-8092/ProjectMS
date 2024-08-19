@@ -1,0 +1,9 @@
+﻿CREATE TABLE [dbo].[Modules]
+(
+    ModuleId INT PRIMARY KEY IDENTITY(1,1),
+    ModuleName NVARCHAR(100) NOT NULL UNIQUE,
+    [Description] NVARCHAR(255) NULL,
+    CreatedAT DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAT DATETIME,
+	IsDeleted BIT DEFAULT 0
+);

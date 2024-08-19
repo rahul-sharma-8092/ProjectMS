@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title | Rahul Sharma</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
+    
+    <!-- SweetAlert2 CSS -->
+    <link href="~/css/sweetalert2.min.css" rel="stylesheet" />
+
+    <link href="~/css/mybootstraptheme.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ProjectMS.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container min-vh-100">
+            @RenderBody()
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- SweetAlert2 JS -->
+    <script src="~/js/sweetalert2@11.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var successMessage = '@TempData["Success"]';
+            var errorMessage = '@TempData["Error"]';
+
+            if (successMessage) {
+                Swal.fire({
+                    text: successMessage,
+                    icon: 'success',
+                    toast: true,
+                    position: 'top',
+                    width: 'auto',
+                    showConfirmButton: false,
+                    timer: 10000,
+                    background: '#3cad10',
+                    color: '#ffffff',
+                });
+            }
+            if (errorMessage) {
+                Swal.fire({
+                    text: errorMessage,
+                    icon: 'error',
+                    toast: true,
+                    position: 'top',
+                    width: 'auto',
+                    showConfirmButton: false,
+                    timer: 10000,
+                    background: '#d90d29',
+                    color: '#ffffff',
+                });
+            }
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

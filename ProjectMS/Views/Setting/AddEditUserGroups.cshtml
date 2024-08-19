@@ -1,0 +1,98 @@
+﻿@model ProjectMS.Models.Setting.UserGroupsModel
+
+@{
+    ViewData["Title"] = "AddEditUserGroups";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="mb-1 mt-1 d-flex justify-content-between align-items-center pr-2">
+        <ol class="breadcrumb border-0 m-0">
+            <li class="breadcrumb-item"><a asp-action="UserGroups" asp-controller="Setting">User Groups</a></li>
+            <li class="breadcrumb-item">
+                @if (string.IsNullOrEmpty(Model.GroupName))
+                {
+                    <a asp-action="AddEditUserGroups" asp-controller="Setting">Add user groups</a>
+                }
+                else
+                {
+                    <a asp-action="AddEditUserGroups" asp-controller="Setting" asp-route-Id="@Model.GroupId" >@Model.GroupName - @Model.GroupId</a>
+                }
+            </li>
+        </ol>
+        @* <div>
+        <a asp-action="AddEditUserGroups" asp-asp-controller="Setting">
+        <span class="btn btn-light mx-2 px-5" tabindex="1">Save</span>
+        </a>
+        <a asp-action="AddEditUserGroups" asp-asp-controller="Setting">
+        <span class="btn btn-success mx-2 px-5" tabindex="2">Cancel</span>
+        </a>
+        </div> *@
+    </div>
+
+
+    <div class="">
+        <form asp-action="AddEditUserGroups" method="post">
+            <div class="row">
+                <div class="col-4">
+                    <label asp-for="GroupId" class="form-label">Group Id</label>
+                    <input asp-for="GroupId" class="form-control mb-3" placeholder="Enter Group Id" tabindex="2" readonly value="@Model.GroupId" />
+                    <span asp-validation-for="GroupId" class="text-danger"></span>
+                </div>
+
+                <div class="col-8">
+                    <label asp-for="GroupName" class="form-label">Group name</label>
+                    <input asp-for="GroupName" value="@Model.GroupName" class="form-control mb-3" placeholder="Enter Group name" tabindex="3" />
+                    <span asp-validation-for="GroupName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" tabindex="4">@Model.Description</textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <section class="mt-4 d-flex flex-wrap flex-col">
+                @for (int i = 0; i < Model.ModulePermissions?.Count; i++)
+                {
+                    var item = Model.ModulePermissions[i];
+                    <div class="form-group mb-3 w33per">
+                        <label class="form-label col-3">@item.ModuleName:</label>
+
+                        <!-- Hidden inputs to hold additional data -->
+                        <input name="ModulePermissions[@i].ModuleName" type="hidden" value="@item.ModuleName" />
+                        <input name="ModulePermissions[@i].ModuleId" type="hidden" value="@item.ModuleId" />
+
+                        <!-- Radio button group with Bootstrap classes -->
+                        <div class="btn-group" role="group" aria-label="Permission options for @item.ModuleName">
+                            <input type="radio" class="btn-check" name="ModulePermissions[@i].Permission" id="btnradio1_@item.ModuleId" value="0" autocomplete="off"
+                            @(item.Permission == 0 ? "checked" : "") />
+                            <label class="btn btn-outline-danger" for="btnradio1_@item.ModuleId">D</label>
+
+                            <input type="radio" class="btn-check" name="ModulePermissions[@i].Permission" id="btnradio2_@item.ModuleId" value="2" autocomplete="off"
+                            @(item.Permission == 2 ? "checked" : "") />
+                            <label class="btn btn-outline-primary" for="btnradio2_@item.ModuleId">R</label>
+
+                            <input type="radio" class="btn-check" name="ModulePermissions[@i].Permission" id="btnradio3_@item.ModuleId" value="1" autocomplete="off"
+                            @(item.Permission == 1 ? "checked" : "") />
+                            <label class="btn btn-outline-success" for="btnradio3_@item.ModuleId">RW</label>
+                        </div>
+                    </div>
+                }
+            </section>
+
+            <div class="form-group mt-4 m-auto">
+                <input type="submit" value="Save" class="mt-4 px-5 btn btn-success" />
+                <a asp-action="UserGroups" asp-controller="Setting" class="mt-4 px-5 ms-3 btn btn-danger">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

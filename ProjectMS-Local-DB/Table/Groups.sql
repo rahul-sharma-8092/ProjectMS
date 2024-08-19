@@ -1,0 +1,9 @@
+﻿CREATE TABLE [dbo].[Groups]
+(
+    GroupId INT PRIMARY KEY IDENTITY(1,1),
+    GroupName NVARCHAR(100) NOT NULL UNIQUE,
+    [Description] NVARCHAR(255) NULL,
+    CreatedAT DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAT DATETIME,
+	IsDeleted BIT DEFAULT 0
+);

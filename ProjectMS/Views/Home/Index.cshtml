@@ -1,0 +1,46 @@
+﻿@model ProjectMS.Models.Login
+
+@{
+    ViewBag.Title = "Login | ProjectMS";
+    Layout = "~/Views/Shared/_LayoutWithoutSidebar.cshtml";
+}
+
+<form asp-action="Index" asp-asp-controller="Home" method="post" class="mt-5">
+    <div class="form-horizontal m-auto w40">
+        <div class="Wraper p-5">
+            <h3 class="text-center mb-5">Welcome Back to ProjectMS</h3>
+            <div>
+                <label asp-for="EmailId" class="control-label fw-bold">Email Id</label>
+                <input asp-for="EmailId" class="form-control" placeholder="Enter Email id" tabindex="3" />
+                <span asp-validation-for="EmailId" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="Password" class="control-label fw-bold mt-2">Password</label>
+                <input asp-for="Password" class="form-control" placeholder="Password" tabindex="3" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="mt-2">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label">Remember me</label>
+                <span asp-validation-for="RememberMe" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <input type="submit" value="Login" class="btn btn-outline-primary mt-3 w30per" />
+                <a asp-action="AddEditUserGroups" asp-controller="Setting" class="btn btn-outline-info mt-3 w30per">
+                    <i class="fa-brands fa-google"></i>
+                    &nbsp;Google
+                </a>
+                <a asp-action="AddEditUserGroups" asp-controller="Setting" class="btn btn-outline-danger mt-3 w30per">
+                    <i class="fa-brands fa-microsoft"></i>
+                    &nbsp;Microsoft
+                </a>
+            </div>
+            <div class="float-end mt-2">
+                <a asp-action="ForgotPassword" asp-controller="Home" class="text-decoration-none">Forgot Password</a>
+            </div>
+        </div>
+    </div>
+</form>
