@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProjectMS.Common;
+using ProjectMS.Repository;
+using ProjectMS.Service;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddTransient<EmailService>();
+//----------------Register All Service----------------//
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ISettingService, SettingService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IEncryptionService, EncryptionService>();
+builder.Services.AddScoped<IMediaService, MediaService>();
+builder.Services.AddScoped<ICommonFuncService, CommonFuncService>();
+
+//----------------Register All Repository----------------//
+builder.Services.AddScoped<IAccountRepository,  AccountRepository>();
+builder.Services.AddScoped<IUserRepository,  UserRepository>();
+builder.Services.AddScoped<ISettingRepository, SettingRepository>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

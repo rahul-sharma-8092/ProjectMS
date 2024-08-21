@@ -3,30 +3,30 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using ProjectMS.Models;
-using ProjectMS.Repository;
-using System.Diagnostics;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Authentication;
-using System.Net;
-using ProjectMS.Common;
-using NuGet.Common;
-using System.Reflection;
+using ProjectMS.Service;
+using System.Diagnostics;
 
 namespace ProjectMS.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IUser user;
+        #region Constructor
         private readonly IConfiguration configuration;
-        private readonly EmailService emailService;
+        private readonly IUserService userService;
+        private readonly IEmailService emailService;
+        private readonly IAccountService accountService;
+        private readonly IEncryptionService encryption;
 
-        public HomeController(IConfiguration _configuration, EmailService _emailService)
+        public HomeController(IConfiguration _configuration, IEmailService _emailService, IUserService _userService, IAccountService _accountService, IEncryptionService _encryption)
         {
             configuration = _configuration;
             emailService = _emailService;
-            user = new UserRepository(_configuration);
+            encryption = _encryption;
+            userService = _userService;
+            accountService = _accountService;
         }
+        #endregion
 
         [HttpGet]
         public IActionResult Index()
@@ -44,10 +44,10 @@ namespace ProjectMS.Controllers
         {
             if (ModelState.IsValid)
             {
-                Users users = user.GetUserDetailbyEmailID(login.EmailId);
+                Users users = userService.GetUserDetailbyEmailID(login.EmailId);
                 if (users != null && !string.IsNullOrEmpty(users.EmailID))
                 {
-                    bool IsPasswordValid = Common.Encryptions.VerifyHashBCrypt(login.Password, users.Password);
+                    bool IsPasswordValid = encryption.VerifyHashBCrypt(login.Password, users.Password);
                     if (IsPasswordValid)
                     {
                         //User Logged-In
@@ -109,7 +109,7 @@ namespace ProjectMS.Controllers
         [HttpPost]
         public async Task<IActionResult> ForgotPassword(string Email)
         {
-            if (user.CheckEmailExists(Email))
+            if (accountService.CheckEmailExists(Email))
             {
                 ForgotPasswordModel forgotPassword = new ForgotPasswordModel();
 
@@ -118,7 +118,7 @@ namespace ProjectMS.Controllers
                 forgotPassword.Email = Email;
                 forgotPassword.IPAddress = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() ?? HttpContext.Connection.RemoteIpAddress?.ToString();
 
-                forgotPassword = user.SaveForgotPassToken(forgotPassword);
+                forgotPassword = accountService.SaveForgotPassToken(forgotPassword);
                 string resetLink = Url.Action("ResetPassword", "Home", new { }, Request.Scheme) + "/" + forgotPassword.Token;
 
                 string emailBody = System.IO.File.ReadAllText("F:\\Asp Dot Net MVC\\MVC\\ProjectMS-X\\ProjectMS\\wwwroot\\EmailTemplates\\PasswordReset.html");
@@ -141,7 +141,7 @@ namespace ProjectMS.Controllers
         [HttpGet]
         public IActionResult ResetPassword(string id)
         {
-            ResetPasswordModel resetPassword = user.GetForgotPassDetailByToken(id);
+            ResetPasswordModel resetPassword = accountService.GetForgotPassDetailByToken(id);
 
             return View(resetPassword);
         }
@@ -149,12 +149,12 @@ namespace ProjectMS.Controllers
         [HttpPost]
         public async Task<IActionResult> ResetPassword(string? id, ResetPasswordModel resetPassword)
         {
-            ResetPasswordModel resetPasswordPrev = user.GetForgotPassDetailByToken(id);
+            ResetPasswordModel resetPasswordPrev = accountService.GetForgotPassDetailByToken(id);
 
             if (ModelState.IsValid && (resetPasswordPrev.Email == resetPassword.Email))
             {
-                resetPassword.Password = Encryptions.CreateHashBCrypt(resetPassword.Password);
-                resetPassword = user.SetResetPassword(resetPassword);
+                resetPassword.Password = encryption.CreateHashBCrypt(resetPassword.Password);
+                resetPassword = accountService.SetResetPassword(resetPassword);
 
                 string emailBody = System.IO.File.ReadAllText("F:\\Asp Dot Net MVC\\MVC\\ProjectMS-X\\ProjectMS\\wwwroot\\EmailTemplates\\PasswordChanged.html");
 

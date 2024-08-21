@@ -1,41 +1,55 @@
 ﻿using ProjectMS.Models;
-using ProjectMS.DBHandler;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace ProjectMS.Repository
 {
-    public class UserRepository : IUser
+    public class UserRepository : IUserRepository
     {
-        private readonly IConfiguration configuration;
-        private readonly UserHandler userHandler;
+        #region Constructor
+        private readonly string connString = "";
 
         public UserRepository(IConfiguration _configuration)
         {
-            configuration = _configuration;
-            userHandler = new UserHandler(configuration);
+            connString = _configuration["ConnectionStrings:dbConnection"] ?? "";
         }
+        #endregion
 
-        bool IUser.CheckEmailExists(string email)
+        public Users GetUserDetailbyEmailID(string email)
         {
-            return userHandler.CheckEmailExists(email);
-        }
+            Users users = new Users();
+            SqlConnection conn = new SqlConnection(connString);
+            SqlCommand cmd = new SqlCommand("GetUserDetailbyEmailID", conn);
 
-        Users IUser.GetUserDetailbyEmailID(string email)
-        {
-            return userHandler.GetUserDetailbyEmailID(email);
-        }
-
-        public ForgotPasswordModel SaveForgotPassToken(ForgotPasswordModel model)
-        {
-            return userHandler.SaveForgotPassToken(model);
-        }
-        public ResetPasswordModel GetForgotPassDetailByToken(string token)
-        {
-            return userHandler.GetForgotPassDetailByToken(token);
-        }
-
-        public ResetPasswordModel SetResetPassword(ResetPasswordModel model)
-        {
-            return userHandler.SetResetPassword(model);
+            try
+            {
+                conn.Open();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@email", email);
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (reader.HasRows)
+                    {
+                        users.UserID = Convert.ToInt64(reader["UserID"]);
+                        users.FirstName = Convert.ToString(reader["FirstName"]);
+                        users.LastName = Convert.ToString(reader["LastName"]);
+                        users.EmailID = Convert.ToString(reader["Email"]);
+                        users.Password = Convert.ToString(reader["Password"]);
+                        users.PhoneNo = Convert.ToString(reader["Phone"]);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+                cmd.Dispose();
+            }
+            return users;
         }
     }
 }

@@ -1,19 +1,19 @@
 ﻿using Microsoft.Data.SqlClient;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using ProjectMS.Models;
 using System.Data;
 
-namespace ProjectMS.DBHandler
+namespace ProjectMS.Repository
 {
-    public class UserHandler
+    public class AccountRepository : IAccountRepository
     {
+        #region Constructor
         private readonly string connString = "";
 
-        public UserHandler(IConfiguration _configuration)
+        public AccountRepository(IConfiguration _configuration)
         {
             connString = _configuration["ConnectionStrings:dbConnection"] ?? "";
         }
-
+        #endregion
 
         public bool CheckEmailExists(string email)
         {
@@ -38,43 +38,6 @@ namespace ProjectMS.DBHandler
                 cmd.Dispose();
             }
             return IsEmailExists;
-        }
-
-        public Users GetUserDetailbyEmailID(string email)
-        {
-            Users users = new Users();
-            SqlConnection conn = new SqlConnection(connString);
-            SqlCommand cmd = new SqlCommand("GetUserDetailbyEmailID", conn);
-
-            try
-            {
-                conn.Open();
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@email", email);
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    if (reader.HasRows)
-                    {
-                        users.UserID = Convert.ToInt64(reader["UserID"]);
-                        users.FirstName = Convert.ToString(reader["FirstName"]);
-                        users.LastName = Convert.ToString(reader["LastName"]);
-                        users.EmailID = Convert.ToString(reader["Email"]);
-                        users.Password = Convert.ToString(reader["Password"]);
-                        users.PhoneNo = Convert.ToString(reader["Phone"]);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-                cmd.Dispose();
-            }
-            return users;
         }
 
         public ForgotPasswordModel SaveForgotPassToken(ForgotPasswordModel model)

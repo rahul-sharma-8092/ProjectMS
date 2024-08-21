@@ -1,34 +1,33 @@
 ﻿using System.Data;
 
-namespace ProjectMS.Common
+namespace ProjectMS.Service
 {
-    public static class CommonFunc
+    public class CommonFuncService : ICommonFuncService
     {
-        public static DataTable ConvertListToDataTable<T>(this IEnumerable<T> data)
+        public DataTable ConvertListToDataTable<T>(IEnumerable<T> data)
         {
             if (data == null)
                 return new DataTable();
 
             var properties = typeof(T).GetProperties();
-            var table = new DataTable(typeof(T).Name);
+            var dataTable = new DataTable(typeof(T).Name);
 
             foreach (var property in properties)
             {
-                table.Columns.Add(property.Name, property.PropertyType);
+                dataTable.Columns.Add(property.Name, property.PropertyType);
             }
 
             foreach (var item in data)
             {
-                var row = table.NewRow();
+                var row = dataTable.NewRow();
                 foreach (var property in properties)
                 {
                     row[property.Name] = property.GetValue(item, null);
                 }
-                table.Rows.Add(row);
-
+                dataTable.Rows.Add(row);
             }
 
-            return table;
+            return dataTable;
         }
     }
 }

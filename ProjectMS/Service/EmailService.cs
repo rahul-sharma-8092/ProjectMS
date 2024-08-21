@@ -1,23 +1,25 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
 
-namespace ProjectMS.Common
+namespace ProjectMS.Service
 {
-    public class EmailService
+    public class EmailService : IEmailService
     {
-        private readonly IConfiguration _configuration;
+        #region Constructor
+        private readonly IConfiguration configuration;
 
-        public EmailService(IConfiguration configuration)
+        public EmailService(IConfiguration _configuration)
         {
-            _configuration = configuration;
+             configuration = _configuration;
         }
+        #endregion
 
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            var smtpServer = _configuration["EmailSettings:SmtpServer"];
-            var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "0");
-            var smtpUsername = _configuration["EmailSettings:SmtpUsername"];
-            var smtpPassword = _configuration["EmailSettings:SmtpPassword"];
+            var smtpServer = configuration["EmailSettings:SmtpServer"];
+            var smtpPort = int.Parse(configuration["EmailSettings:SmtpPort"] ?? "0");
+            var smtpUsername = configuration["EmailSettings:SmtpUsername"];
+            var smtpPassword = configuration["EmailSettings:SmtpPassword"];
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("ProjectMS | Rahul Sharma", smtpUsername));

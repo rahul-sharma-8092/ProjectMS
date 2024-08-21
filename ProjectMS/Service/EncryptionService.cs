@@ -1,28 +1,24 @@
-﻿using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
-namespace ProjectMS.Common
+namespace ProjectMS.Service
 {
-    public static class Encryptions
+    public class EncryptionService : IEncryptionService
     {
-        private static byte[] _Aeskey;
-        private static byte[] _AesIV;
+        #region Constructor
+        private readonly IConfiguration configuration;
+        private byte[] _Aeskey;
+        private byte[] _AesIV;
 
-        static Encryptions()
+        public EncryptionService(IConfiguration _configuration)
         {
-            var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
-
+            configuration = _configuration;
             _Aeskey = Convert.FromBase64String(configuration["Encryption:AesKey"] ?? "");
             _AesIV = Convert.FromBase64String(configuration["Encryption:AesIV"] ?? "");
-
-            //string AesKey = "4ejR3667Wuzc5NN3ljV6mxwfrcCKtPNa0fhrJ7Voyps=";
-            //string AesIV = "BwzsNqTDYyRQtycvscPhDQ==";
         }
+        #endregion
 
         #region Password Hashing - BCrypt
-        public static string CreateHashBCrypt(string password)
+        public string CreateHashBCrypt(string password)
         {
             string salt = BCrypt.Net.BCrypt.GenerateSalt(10, BCrypt.Net.SaltRevision.Revision2X);
             string hash = BCrypt.Net.BCrypt.HashPassword(password, salt);
@@ -30,7 +26,7 @@ namespace ProjectMS.Common
             return hash;
         }
 
-        public static bool VerifyHashBCrypt(string password, string hashPassword)
+        public bool VerifyHashBCrypt(string password, string hashPassword)
         {
             if (string.IsNullOrEmpty(hashPassword))
             {
@@ -44,7 +40,7 @@ namespace ProjectMS.Common
         #endregion
 
         #region Encryption - AES (Advanced Encryption Standard)
-        public static string Encryption(string plainText)
+        public string Encryption(string plainText)
         {
             if (string.IsNullOrEmpty(plainText))
                 return plainText;
@@ -70,7 +66,7 @@ namespace ProjectMS.Common
             }
         }
 
-        public static string Decryption(string cipherText)
+        public string Decryption(string cipherText)
         {
             if (string.IsNullOrEmpty(cipherText))
                 return cipherText;
@@ -94,26 +90,7 @@ namespace ProjectMS.Common
                 }
             }
         }
-
-        private static byte[] GenerateRandomKey()
-        {
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.GenerateKey();
-                string keyss = Convert.ToBase64String(aesAlg.Key);
-                return aesAlg.Key;
-            }
-        }
-
-        private static byte[] GenerateRandomIV()
-        {
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.GenerateIV();
-                string IV = Convert.ToBase64String(aesAlg.Key);
-                return aesAlg.IV;
-            }
-        }
         #endregion
+
     }
 }
